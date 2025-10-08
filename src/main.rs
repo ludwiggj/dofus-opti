@@ -1,8 +1,12 @@
 mod models;
+mod dofus_db_models;
+mod dofus_db_client;
 
 use models::{CharacteristicRange, CharacteristicType, Gear, GearType};
+use anyhow::Result;
+use dofus_db_client::fetch_amulets;
 
-fn main() {
+fn show_croco_shield() {
     let crocoshield = Gear {
         name: String::from("Crocoshield"),
         gear_type: GearType::Amulet,
@@ -22,4 +26,15 @@ fn main() {
     };
 
     println!("Example of a gear: {:?}", crocoshield);
+}
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    show_croco_shield();
+
+    let result = fetch_amulets(0).await?;
+
+    println!("{:#?}", result);
+
+    Ok(())
 }

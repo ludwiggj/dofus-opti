@@ -1,1 +1,1 @@
-Based on Rust series posted at https://rustjobs.dev/blog/, staring with https://rustjobs.dev/blog/kicking-off-my-rust-journey/
+Based on Rust series posted at https://rustjobs.dev/blog/, starting with https://rustjobs.dev/blog/kicking-off-my-rust-journey/
