@@ -1,5 +1,5 @@
 #[derive(Debug)]
-pub struct Gear {
+pub(crate) struct Gear {
     pub(crate) name: String,
     pub(crate) gear_type: GearType,
     pub(crate) level: u32,
@@ -7,7 +7,7 @@ pub struct Gear {
 }
 
 #[derive(Debug)]
-pub enum GearType {
+pub(crate) enum GearType {
     Amulet,
     Hat,
     Ring,
@@ -16,14 +16,14 @@ pub enum GearType {
 }
 
 #[derive(Debug)]
-pub struct CharacteristicRange {
+pub(crate) struct CharacteristicRange {
     pub(crate) kind: CharacteristicType,
     pub(crate) min: i32,
     pub(crate) max: i32
 }
 
 #[derive(Debug)]
-pub enum CharacteristicType {
+pub(crate) enum CharacteristicType {
     Vitality,
     Power
     // Add all other types
