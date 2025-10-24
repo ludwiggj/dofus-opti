@@ -7,6 +7,14 @@ pub(crate)  struct GetObjectsResponse {
     total: u32,
     limit: u32,
     skip: u32,
+    pub(crate) data: Vec<serde_json::Value>
+}
+
+#[derive(Debug, Deserialize)]
+pub(crate)  struct GetObjectsResponse2 {
+    total: u32,
+    limit: u32,
+    skip: u32,
     pub(crate) data: Vec<DofusDbObject>
 }
 

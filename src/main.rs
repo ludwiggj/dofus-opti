@@ -4,7 +4,9 @@ mod dofus_db_client;
 mod model_parser;
 
 use anyhow::Result;
+use serde::Deserialize;
 use crate::dofus_db_client::fetch_amulets;
+use crate::dofus_db_models::DofusDbObject;
 use crate::model_parser::parse_gear;
 use crate::models::{CharacteristicRange, CharacteristicType, Gear, GearType};
 
@@ -38,8 +40,15 @@ async fn main() -> Result<()> {
 
     println!("{:#?}", result);
 
+    // https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html#a-shortcut-for-propagating-errors-the--operator
+    let blah: Vec<DofusDbObject> = result.data.iter()
+        // .map(|x| (serde_json::from_str(x.to_string().as_str())).unwrap()).collect();
+        .map(|x| DofusDbObject::deserialize(x).unwrap()).collect();
+
+    //let r2: Vec<DofusDbObject> = serde_json::from_str(result.data);
+
     // idiomatic - see https://doc.rust-lang.org/rust-by-example/flow_control/for.html
-    for data in result.data {
+    for data in blah {
         println!("{:?}", parse_gear(data));
     }
 
@@ -49,7 +58,7 @@ async fn main() -> Result<()> {
 
     // let bob = result.data[0];
 
-    // Type mismatch [E0308]
+    // Type mismatch [E0308]
     // Expected:
     //     dofus_opti::dofus_db_models::DofusDbObject
     // Found:
