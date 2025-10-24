@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug)]
 pub(crate) struct Gear {
     pub(crate) name: String,
@@ -13,6 +15,14 @@ pub(crate) enum GearType {
     Ring,
     Shield
     // Add all other types
+}
+
+// As per https://users.rust-lang.org/t/how-can-i-implement-fmt-display-for-enum/24111
+impl fmt::Display for GearType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // defers to the debug formatter
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(Debug)]
