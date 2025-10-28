@@ -2,3 +2,4 @@
 .idea
 Cargo.lock
 dofus-db
+dofus_db/data
