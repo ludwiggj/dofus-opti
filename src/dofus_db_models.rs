@@ -3,31 +3,31 @@
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-pub(crate)  struct GetObjectsResponse {
+pub struct GetObjectsResponse {
     total: u32,
     limit: u32,
     skip: u32,
-    pub(crate) data: Vec<serde_json::Value>
+    pub data: Vec<serde_json::Value>
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct DofusDbObject {
-    pub(crate) name: TranslatedString,
-    pub(crate) typeId: i32,
-    pub(crate) level: u32,
+pub struct DofusDbObject {
+    pub name: TranslatedString,
+    pub typeId: i32,
+    pub level: u32,
     img: String,
-    pub(crate) effects: Vec<Effect>
+    pub effects: Vec<Effect>
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct TranslatedString {
-    pub(crate) en: String,
+pub struct TranslatedString {
+    pub en: String,
     fr: String
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct Effect {
-    pub(crate) from: i32,
-    pub(crate) to: i32,
-    pub(crate) characteristic: i32
+pub struct Effect {
+    pub from: i32,
+    pub to: i32,
+    pub characteristic: i32
 }

@@ -1,7 +1,7 @@
 use crate::dofus_db_models::{DofusDbObject, Effect};
 use crate::models::{CharacteristicRange, CharacteristicType, Gear, GearType};
 
-pub(crate) fn parse_gear(object: DofusDbObject) -> Result<Gear, String> {
+pub fn parse_gear(object: DofusDbObject) -> Result<Gear, String> {
    Ok(Gear {
       name: object.name.en,
       gear_type: parse_object_type(object.typeId)?,
