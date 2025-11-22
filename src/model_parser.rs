@@ -1,26 +1,14 @@
 use crate::dofus_db_models::{DofusDbObject, Effect};
-use crate::models::{CharacteristicRange, CharacteristicType, Gear, GearType};
+use crate::models::{CharacteristicRange, CharacteristicType, Gear};
+use crate::dofus_db_type_id::{DofusDbTypeId, parse_gear_type};
 
 pub fn parse_gear(object: DofusDbObject) -> Result<Gear, String> {
    Ok(Gear {
       name: object.name.en,
-      gear_type: parse_object_type(object.typeId)?,
+      gear_type: parse_gear_type(DofusDbTypeId::new(object.typeId))?,
       level: object.level,
       characteristics: parse_characteristics(object.effects)
    })
-}
-
-fn parse_object_type(id: i32) -> Result<GearType, String> {
-   match id {
-      1 => Ok(GearType::Amulet),
-      2 => Ok(GearType::Bow),
-      6 => Ok(GearType::Sword),
-      9 => Ok(GearType::Ring),
-      11 => Ok(GearType::Boots),
-      19 => Ok(GearType::Axe),
-      30 => Ok(GearType::Belt),
-      _ => Err(format!("Unknown gear type {}", id))
-   }
 }
 
 fn parse_characteristics(effects: Vec<Effect>) -> Vec<CharacteristicRange> {
