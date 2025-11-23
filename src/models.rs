@@ -1,3 +1,9 @@
+// Part of the library. When the crate is compiled, the first step is to compile the library.
+
+// use crate::... refers to the library's module hierarchy.
+// use packagename::... will not work inside the library part of the crate because only the
+// names of dependencies are available at the top level.
+
 use std::fmt;
 
 #[derive(Debug)]
@@ -8,7 +14,7 @@ pub struct Gear {
     pub characteristics: Vec<CharacteristicRange>
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum GearType {
     Amulet,
     Axe,

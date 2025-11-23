@@ -1,3 +1,9 @@
+// Part of the library. When the crate is compiled, the first step is to compile the library.
+
+// use crate::... refers to the library's module hierarchy.
+// use packagename::... will not work inside the library part of the crate because only the
+// names of dependencies are available at the top level.
+
 #![allow(non_snake_case)]
 
 use serde::Deserialize;

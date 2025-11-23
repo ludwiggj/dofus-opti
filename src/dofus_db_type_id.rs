@@ -1,5 +1,12 @@
+// Part of the library. When the crate is compiled, the first step is to compile the library.
+
+// use crate::... refers to the library's module hierarchy.
+// use packagename::... will not work inside the library part of the crate because only the
+// names of dependencies are available at the top level.
+
 use crate::models::GearType;
 
+#[derive(Debug, PartialEq)]
 pub struct DofusDbTypeId(i32);
 
 impl DofusDbTypeId {
@@ -34,4 +41,19 @@ pub fn parse_gear_type(id: DofusDbTypeId) -> Result<GearType, String> {
        DofusDbTypeId(30) => Ok(GearType::Belt),
        DofusDbTypeId(i) => Err(format!("Unknown gear id {}", i))
    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::ALL_GEAR_TYPES;
+
+    #[test]
+    fn parse_valid_gear_types() {
+        for gear_type in ALL_GEAR_TYPES {
+            let result = parse_gear_type(DofusDbTypeId::from(gear_type));
+            let expected = Ok(*gear_type);
+            assert_eq!(result, expected);
+        }
+    }
 }
