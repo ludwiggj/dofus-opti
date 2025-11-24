@@ -18,18 +18,13 @@ use futures::{StreamExt, stream};
 use serde::Deserialize;
 use serde_json::to_string_pretty;
 use std::time::Instant;
+use std::path::Path;
 
-const DOFUS_DB_EXPORT_PATH: &str = "dofus_db/data";
-
-// This version prints everything in a double iteration:
-
-// let dofus_db_objects: Vec<DofusDbObject> = result.iter()
-//     .map(|x| DofusDbObject::deserialize(x).unwrap()).collect();
-//
-// for dofus_db_object in dofus_db_objects {
-//     println!("{:?}", parse_gear(dofus_db_object));
-// }
 pub async fn fetch_and_save_all_gears(gear_type: &GearType) -> Result<()> {
+    // const dofus_db_export_path: &str = "dofus_db/data";
+
+    let dofus_db_export_path: &Path = Path::new("dofus_db/data");
+
     let result = fetch_all_gears(gear_type).await?;
 
     println!("First 10 gear of type: {}", gear_type);
@@ -38,13 +33,11 @@ pub async fn fetch_and_save_all_gears(gear_type: &GearType) -> Result<()> {
         .take(10)
         .for_each(|x| println!("  {:?}", parse_gear(DofusDbObject::deserialize(x).unwrap())));
 
-    save_gears(DOFUS_DB_EXPORT_PATH, gear_type, &result)?;
+    save_gears(dofus_db_export_path, gear_type, &result)?;
 
     println!("First gear of type: {} read back from disk", gear_type);
 
-    // read_gears(gear_type)?.iter().take(1).for_each(|x| println!("  {:?}", x));
-
-    read_gears(DOFUS_DB_EXPORT_PATH, gear_type)?
+    read_gears(dofus_db_export_path, gear_type)?
         .iter()
         .take(1)
         .for_each(|x| match to_string_pretty(x) {
@@ -54,6 +47,15 @@ pub async fn fetch_and_save_all_gears(gear_type: &GearType) -> Result<()> {
 
     Ok(())
 }
+
+// Old version: prints everything in a double iteration...
+
+// let dofus_db_objects: Vec<DofusDbObject> = result.iter()
+//     .map(|x| DofusDbObject::deserialize(x).unwrap()).collect();
+//
+// for dofus_db_object in dofus_db_objects {
+//     println!("{:?}", parse_gear(dofus_db_object));
+// }
 
 #[tokio::main]
 async fn main() -> Result<()> {

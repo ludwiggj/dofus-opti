@@ -4,17 +4,9 @@ use anyhow::Result;
 use std::path::Path;
 use std::fs;
 use serde_json::Value;
-use tempfile:: TempDir;
+use tempfile::TempDir;
 
-fn create_dir_name(base_path: &str, gear_type: &GearType) -> String {
-    format!("{base_path}/{gear_type}")
-        .to_lowercase()
-        .replace(" ", "_")
-        .replace("-", "_")
-        .replace("'s", "")
-}
-
-fn get_object_name(object: &serde_json::Value, index: usize) -> String {
+fn get_object_name(object: &Value, index: usize) -> String {
     object["name"]["en"]
         .as_str()
         .map(String::from)
@@ -30,13 +22,12 @@ fn create_filename(gear_type: &GearType, object_name: &str) -> String {
 }
 
 pub fn save_gears(
-    base_path: &str,
+    base_path: &Path,
     gear_type: &GearType,
-    gears: &Vec<serde_json::Value>
+    gears: &Vec<Value>
 ) -> Result<()> {
-    let dir_name = create_dir_name(base_path, gear_type);
-    let out_dir_path = Path::new(&dir_name);
-    fs::create_dir_all(out_dir_path)?;
+    let out_dir_path = base_path.join(gear_type.to_string());
+    fs::create_dir_all(out_dir_path.clone())?;
     for (i, object) in gears.iter().enumerate() {
         let object_name = get_object_name(object, i);
         let file_name = create_filename(gear_type, &object_name);
@@ -48,24 +39,23 @@ pub fn save_gears(
         "Written {} entry/ies of gear type {} to directory {}",
         gears.len(),
         gear_type,
-        dir_name
+        out_dir_path.to_str().unwrap_or_default()
     );
     Ok(())
 }
 
 pub fn read_gears(
-    base_path: &str,
+    base_path: &Path,
     gear_type: &GearType
-) -> Result<Vec<serde_json::Value>> {
-    let dir_name = create_dir_name(base_path, gear_type);
-    let in_dir_path = Path::new(&dir_name);
-    let mut gears: Vec<serde_json::Value> = vec![];
+) -> Result<Vec<Value>> {
+    let in_dir_path = base_path.join(gear_type.to_string());
+    let mut gears: Vec<Value> = vec![];
     for entry in fs::read_dir(in_dir_path)? {
         let entry = entry?;
         let path = entry.path();
         if path.is_file() {
             let file_content = fs::read_to_string(&path)?;
-            let json_value: serde_json::Value = serde_json::from_str(&file_content)?;
+            let json_value: Value = serde_json::from_str(&file_content)?;
             gears.push(json_value);
         }
     }
@@ -74,7 +64,7 @@ pub fn read_gears(
 
 // Other variations
 pub fn save_dofus_db_data_1(
-    objects: &Vec<serde_json::Value>,
+    objects: &Vec<Value>,
     gear_type: GearType
 ) -> Result<(), Box<dyn Error>> {
     let out_dir = Path::new("dofus_db/data1");
@@ -91,7 +81,7 @@ pub fn save_dofus_db_data_1(
 }
 
 pub fn save_dofus_db_data_2(
-    objects: &Vec<serde_json::Value>,
+    objects: &Vec<Value>,
     gear_type: GearType
 ) -> Result<()> {
     let out_dir = Path::new("dofus_db/data2");
@@ -115,9 +105,10 @@ fn write_read_gears() -> Result<()> {
     let json_values: Vec<Value> = vec![json_1, json_2]
         .into_iter()
         .map(serde_json::from_str)
-        .collect::<Result<Vec<serde_json::Value>, _>>()?;
+        .collect::<Result<Vec<Value>, _>>()?;
 
-    let base_dir = TempDir::new()?.path().to_str().unwrap().to_string();
+    let temp_dir = TempDir::new()?;
+    let base_dir = temp_dir.path();
     let gear_type = GearType::Amulet;
 
     save_gears(&base_dir, &gear_type, &json_values)?;
