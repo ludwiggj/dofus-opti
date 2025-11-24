@@ -9,12 +9,12 @@
 // use crate::...       refers to the binary's own module hierarchy
 
 use anyhow::Result;
-use dofus_opti::dofus_db_client::fetch_amulets;
 use dofus_opti::dofus_db_models::DofusDbObject;
 use dofus_opti::model_parser::parse_gear;
 use dofus_opti::models::GearType;
+use dofus_opti::superceded::dofus_db_client:: fetch_amulets;
+use dofus_opti::superceded::dofus_db_file::{save_dofus_db_data_1, save_dofus_db_data_2};
 use serde::Deserialize;
-use dofus_opti::dofus_db_file::{save_dofus_db_data_1, save_dofus_db_data_2};
 
 #[tokio::main]
 async fn main() -> Result<()> {

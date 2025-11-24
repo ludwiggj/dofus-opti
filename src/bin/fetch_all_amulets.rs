@@ -9,7 +9,7 @@
 // use crate::...       refers to the binary's own module hierarchy
 
 use anyhow::Result;
-use dofus_opti::dofus_db_client::fetch_all_amulets;
+use dofus_opti::superceded::dofus_db_client::fetch_all_amulets;
 
 #[tokio::main]
 async fn main() -> Result<()> {

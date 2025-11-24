@@ -8,3 +8,4 @@ pub mod dofus_db_models;
 pub mod dofus_db_type_id;
 pub mod model_parser;
 pub mod models;
+pub mod superceded;
