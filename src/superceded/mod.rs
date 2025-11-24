@@ -1,2 +1,1 @@
-pub mod dofus_db_client;
-pub mod dofus_db_file;
+pub mod old_dofus_db_client;

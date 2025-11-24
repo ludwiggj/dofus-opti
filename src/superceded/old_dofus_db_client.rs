@@ -17,20 +17,3 @@ pub async fn fetch_amulets(skip: u32) -> reqwest::Result<GetObjectsResponse> {
 
     Ok(data)
 }
-
-pub async fn fetch_all_amulets() -> reqwest::Result<Vec<serde_json::Value>> {
-    let mut gears: Vec<serde_json::Value> = vec![];
-
-    loop {
-        let mut response = fetch_amulets(gears.len() as u32).await?;
-        if response.data.is_empty() {
-            break;
-        } else {
-            gears.append(&mut response.data);
-        }
-    }
-
-    println!("Amulet gear count: {}", gears.len());
-
-    Ok(gears)
-}

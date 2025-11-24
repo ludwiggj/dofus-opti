@@ -9,7 +9,24 @@
 // use crate::...       refers to the binary's own module hierarchy
 
 use anyhow::Result;
-use dofus_opti::superceded::dofus_db_client::fetch_all_amulets;
+use dofus_opti::superceded::old_dofus_db_client::fetch_amulets;
+
+async fn fetch_all_amulets() -> reqwest::Result<Vec<serde_json::Value>> {
+    let mut gears: Vec<serde_json::Value> = vec![];
+
+    loop {
+        let mut response = fetch_amulets(gears.len() as u32).await?;
+        if response.data.is_empty() {
+            break;
+        } else {
+            gears.append(&mut response.data);
+        }
+    }
+
+    println!("Amulet gear count: {}", gears.len());
+
+    Ok(gears)
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
