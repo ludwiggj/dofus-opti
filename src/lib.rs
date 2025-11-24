@@ -4,7 +4,8 @@
 pub mod dofus_db_client;
 pub mod dofus_db_file;
 pub mod dofus_db_models;
-pub mod dofus_db_type_id;
-pub mod model_parser;
+pub mod dofus_db_parser;
 pub mod models;
+
+// Code to share across binaries
 pub mod superceded;

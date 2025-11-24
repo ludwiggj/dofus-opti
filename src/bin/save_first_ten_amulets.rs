@@ -14,7 +14,7 @@ use std::path::Path;
 use anyhow::Result;
 use dofus_opti::dofus_db_file::{create_filename, get_object_name};
 use dofus_opti::dofus_db_models::DofusDbObject;
-use dofus_opti::model_parser::parse_gear;
+use dofus_opti::dofus_db_parser::parse_gear;
 use dofus_opti::models::GearType;
 use dofus_opti::superceded::old_dofus_db_client::fetch_amulets;
 use serde::Deserialize;

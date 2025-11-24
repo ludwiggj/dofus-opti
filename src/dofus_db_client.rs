@@ -4,14 +4,14 @@
 // use packagename::... will not work inside the library part of the crate because only the
 // names of dependencies are available at the top level.
 
-use crate::dofus_db_models::GetObjectsResponse;
-use crate::models::{GearType, gear_type_to_type_id};
+use crate::dofus_db_models::{DofusDbTypeId, GetObjectsResponse};
+use crate::models::GearType;
 
 pub async fn fetch_gear(gear_type: &GearType, skip: u32) -> reqwest::Result<GetObjectsResponse> {
-    let type_id = gear_type_to_type_id(gear_type);
+    let type_id = DofusDbTypeId::from(gear_type);
 
     let url = format!(
-        "https://api.dofusdb.fr/items?typeId[$in][]={}&$sort=-id&$skip={}", type_id, skip
+        "https://api.dofusdb.fr/items?typeId[$in][]={}&$sort=-id&$skip={}", type_id.0, skip
     );
 
     let rsp = reqwest::get(url).await?;

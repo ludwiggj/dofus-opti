@@ -11,7 +11,7 @@ use anyhow::Result;
 use dofus_opti::dofus_db_client::fetch_all_gears;
 use dofus_opti::dofus_db_file::{read_gears, save_gears};
 use dofus_opti::dofus_db_models::DofusDbObject;
-use dofus_opti::model_parser::parse_gear;
+use dofus_opti::dofus_db_parser::parse_gear;
 use dofus_opti::models::{ALL_GEAR_TYPES, GearType};
 use futures::{StreamExt, stream};
 use serde::Deserialize;
