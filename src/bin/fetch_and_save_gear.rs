@@ -18,12 +18,9 @@ use futures::{StreamExt, stream};
 use serde::Deserialize;
 use serde_json::to_string_pretty;
 use std::time::Instant;
-use std::path::Path;
 
 pub async fn fetch_and_save_all_gears(gear_type: &GearType) -> Result<()> {
-    // const dofus_db_export_path: &str = "dofus_db/data";
-
-    let dofus_db_export_path: &Path = Path::new("dofus_db/data");
+    let dofus_db_export_path: &str = "dofus_db/data";
 
     let result = fetch_all_gears(gear_type).await?;
 

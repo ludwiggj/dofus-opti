@@ -21,12 +21,12 @@ fn create_filename(gear_type: &GearType, object_name: &str) -> String {
         .replace("'s", "")
 }
 
-pub fn save_gears(
-    base_path: &Path,
+pub fn save_gears<P: AsRef<Path>>(
+    base_path: P,
     gear_type: &GearType,
     gears: &Vec<Value>
 ) -> Result<()> {
-    let out_dir_path = base_path.join(gear_type.to_string());
+    let out_dir_path = base_path.as_ref().join(gear_type.to_string());
     fs::create_dir_all(out_dir_path.clone())?;
     for (i, object) in gears.iter().enumerate() {
         let object_name = get_object_name(object, i);
@@ -44,11 +44,11 @@ pub fn save_gears(
     Ok(())
 }
 
-pub fn read_gears(
-    base_path: &Path,
+pub fn read_gears<P: AsRef<Path>>(
+    base_path: P,
     gear_type: &GearType
 ) -> Result<Vec<Value>> {
-    let in_dir_path = base_path.join(gear_type.to_string());
+    let in_dir_path = base_path.as_ref().join(gear_type.to_string());
     let mut gears: Vec<Value> = vec![];
     for entry in fs::read_dir(in_dir_path)? {
         let entry = entry?;
