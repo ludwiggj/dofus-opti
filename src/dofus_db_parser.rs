@@ -31,6 +31,13 @@ fn parse_characteristics(effects: Vec<Effect>) -> Vec<CharacteristicRange> {
         .collect()
 }
 
+// fn parse_characteristics_new(effects: Vec<Effect>) -> Result<Vec<CharacteristicRange>, String> {
+//     effects
+//         .into_iter()
+//         .map(parse_characteristic_range)
+//         .collect()
+// }
+
 fn parse_characteristic_range(effect: Effect) -> Result<CharacteristicRange, String> {
     Ok(CharacteristicRange {
         kind: parse_characteristic_type(effect.characteristic)?,
