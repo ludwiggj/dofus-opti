@@ -11,7 +11,7 @@
 use anyhow::Result;
 use dofus_opti::superceded::old_dofus_db_client::fetch_amulets;
 
-async fn fetch_all_amulets() -> reqwest::Result<Vec<serde_json::Value>> {
+async fn fetch_all_amulets() -> Result<Vec<serde_json::Value>> {
     let mut gears: Vec<serde_json::Value> = vec![];
 
     loop {

@@ -36,10 +36,7 @@ async fn main() -> Result<()> {
 
     let args = Args::parse();
 
-    if args.import {
-        println!("Importing data from Dofus DB site...");
-
-        // fetch and save
+    async fn fetch_and_save() {
         const MAX_CONCURRENCY: usize = 5;
         stream::iter(ALL_GEAR_TYPES)
             .for_each_concurrent(MAX_CONCURRENCY, |gear_type| async move {
@@ -47,14 +44,41 @@ async fn main() -> Result<()> {
                     eprintln!("❌ Failed to process gear_type {}: {}", gear_type, e);
                 } else {
                     println!("✅ Successfully processed gear_type {}", gear_type);
-                }
+                };
+                println!("=================================================");
             }).await;
+    }
+
+    if args.import {
+        println!("Importing data from Dofus DB site...");
+        fetch_and_save().await;
     }
 
     if args.export {
         println!("Exporting Dofus DB data to our model...");
 
-        // read, parse, write
+        // read, parse, write out our model representation
+
+        // Example layout:
+
+        // core/
+        // └── data/
+        //     ├── Amulet/
+        //     │   ├── aerdala_amulet.json
+        //     │   ├── helsephine_love.json
+        //     │   └── ...
+        //     ├── Belt/
+        //     │   ├── minotoror.json
+        //     │   ├── ogivol.json
+        //     │   └── ...
+    }
+
+    if !args.import && !args.export {
+        println!("No action specified. Use -i to import or -e to export.");
+        println!("Example: cargo run --bin dofus-opti -- -i");
+        println!("Importing as default action...\n");
+
+        fetch_and_save().await;
     }
 
     let elapsed = now.elapsed();

@@ -1,28 +1,31 @@
 use crate::models::GearType;
 use anyhow::Result;
-use serde_json::Value;
+use serde_json::{Value as JsonValue};
 use std::fs;
 use std::path::Path;
 
-pub fn get_object_name(object: &Value, index: usize) -> String {
+pub fn get_object_name(object: &JsonValue, index: usize) -> String {
     object["name"]["en"]
         .as_str()
         .map(String::from)
         .unwrap_or(format!("unknown_{}", index))
 }
 
-pub fn create_filename(gear_type: &GearType, object_name: &str) -> String {
-    format!("{gear_type}_{object_name}.json")
-        .to_lowercase()
+pub fn filename_safe_string(s: &str) -> String {
+    s.to_lowercase()
         .replace(" ", "_")
         .replace("-", "_")
         .replace("'s", "")
 }
 
+pub fn create_filename(gear_type: &GearType, object_name: &str) -> String {
+    filename_safe_string(&format!("{gear_type}_{object_name}.json"))
+}
+
 pub fn save_gears<P: AsRef<Path>>(
     base_path: P,
     gear_type: &GearType,
-    gears: &Vec<Value>,
+    gears: &Vec<JsonValue>,
 ) -> Result<()> {
     let out_dir_path = base_path.as_ref().join(gear_type.to_string());
     fs::create_dir_all(out_dir_path.clone())?;
@@ -34,7 +37,7 @@ pub fn save_gears<P: AsRef<Path>>(
         fs::write(file_path, json_str)?;
     }
     println!(
-        "Written {} entry/ies of gear type {} to directory {}",
+        "✅ Written {} entry/ies of gear type {} to directory {}",
         gears.len(),
         gear_type,
         out_dir_path.to_str().unwrap_or_default()
@@ -42,24 +45,36 @@ pub fn save_gears<P: AsRef<Path>>(
     Ok(())
 }
 
-pub fn read_gears<P: AsRef<Path>>(base_path: P, gear_type: &GearType) -> Result<Vec<Value>> {
+pub fn read_gears<P: AsRef<Path>>(base_path: P, gear_type: &GearType) -> Result<Vec<JsonValue>> {
     let in_dir_path = base_path.as_ref().join(gear_type.to_string());
-    let mut gears: Vec<Value> = vec![];
-    for entry in fs::read_dir(in_dir_path)? {
+    let in_dir_path_name = in_dir_path.as_path().to_str().unwrap_or("unknown_path");
+    let mut gears: Vec<JsonValue> = vec![];
+    for entry in fs::read_dir(in_dir_path.clone())? {
         let entry = entry?;
         let path = entry.path();
         if path.is_file() {
-            let file_content = fs::read_to_string(&path)?;
-            let json_value: Value = serde_json::from_str(&file_content)?;
-            gears.push(json_value);
+            let file_content = fs::read_to_string(&path);
+
+            match file_content {
+                Ok(content) => {
+                    let json_value: JsonValue = serde_json::from_str(&content)?;
+                    gears.push(json_value);
+                },
+                Err(e) => {
+                    println!("❌ Failed to read file {}: {}", path.display(), e);
+                }
+            }
         }
     }
+
+    println!("✅ Successfully read {} entries from {} into json", gears.len(), in_dir_path_name);
+
     Ok(gears)
 }
 
-pub fn read_json<P: AsRef<Path>>(path: P) -> Result<Value> {
+pub fn read_json<P: AsRef<Path>>(path: P) -> Result<JsonValue> {
     let file_content = fs::read_to_string(path)?;
-    let json_value: Value = serde_json::from_str(&file_content)?;
+    let json_value: JsonValue = serde_json::from_str(&file_content)?;
     Ok(json_value)
 }
 
@@ -71,7 +86,7 @@ mod tests {
     #[test]
     fn get_object_name_with_english_name() -> Result<()> {
         let data = r#"{ "name": { "en": "Great Amulet", "fr": "Grande Amulette" } }"#;
-        let json_value: Value = serde_json::from_str(data)?;
+        let json_value: JsonValue = serde_json::from_str(data)?;
         let dummy_index = 0;
 
         assert_eq!(get_object_name(&json_value, dummy_index), String::from("Great Amulet"));
@@ -82,7 +97,7 @@ mod tests {
     #[test]
     fn get_object_name_without_english_name() -> Result<()> {
         let data = r#"{ "name": { "fr": "Grande Amulette" } }"#;
-        let json_value: Value = serde_json::from_str(data)?;
+        let json_value: JsonValue = serde_json::from_str(data)?;
         let dummy_index = 0;
 
         assert_eq!(get_object_name(&json_value, dummy_index), format!("unknown_{dummy_index}"));
@@ -96,10 +111,10 @@ mod tests {
         let json_1 = r#"{ "name": { "en": "Great Amulet", "fr": "Grande Amulette" } }"#;
         let json_2 = r#"{ "foo": "bar" }"#;
 
-        let json_values: Vec<Value> = vec![json_1, json_2]
+        let json_values: Vec<JsonValue> = vec![json_1, json_2]
             .into_iter()
             .map(serde_json::from_str)
-            .collect::<Result<Vec<Value>, _>>()?;
+            .collect::<Result<Vec<JsonValue>, _>>()?;
 
         let temp_dir = TempDir::new()?;
         let base_dir = temp_dir.path();

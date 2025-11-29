@@ -7,6 +7,8 @@
 use crate::dofus_db_models::{DofusDbTypeId, GetObjectsResponse};
 use crate::models::GearType;
 
+use serde_json::{Value as JsonValue};
+
 pub async fn fetch_gear(gear_type: &GearType, skip: u32) -> reqwest::Result<GetObjectsResponse> {
     let type_id = DofusDbTypeId::from(gear_type);
 
@@ -21,8 +23,8 @@ pub async fn fetch_gear(gear_type: &GearType, skip: u32) -> reqwest::Result<GetO
     Ok(data)
 }
 
-pub async fn fetch_all_gears(gear_type: &GearType) -> reqwest::Result<Vec<serde_json::Value>> {
-    let mut gears: Vec<serde_json::Value> = vec![];
+pub async fn fetch_all_gears(gear_type: &GearType) -> reqwest::Result<Vec<JsonValue>> {
+    let mut gears: Vec<JsonValue> = vec![];
 
     loop {
         let mut response = fetch_gear(gear_type, gears.len() as u32).await?;
