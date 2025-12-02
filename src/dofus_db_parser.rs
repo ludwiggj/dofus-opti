@@ -7,10 +7,7 @@
 use crate::dofus_db_models::*;
 use crate::models::*;
 
-pub fn parse_gears(
-    gear_type: &GearType,
-    dofus_db_objects: Vec<DofusDbObject>
-) -> Vec<Gear> {
+pub fn parse_gears(gear_type: &GearType, dofus_db_objects: Vec<DofusDbObject>) -> Vec<Gear> {
     let mut gears: Vec<Gear> = Vec::new();
     let input_object_count = dofus_db_objects.len();
 
@@ -103,7 +100,7 @@ mod tests {
     fn parse_valid_gear_types() {
         for gear_type in ALL_GEAR_TYPES {
             let type_id = DofusDbTypeId::from(gear_type);
-            assert_eq!(parse_gear_type(type_id), Ok(gear_type.clone()));
+            assert_eq!(Ok(gear_type.clone()), parse_gear_type(type_id));
         }
     }
 
@@ -111,8 +108,8 @@ mod tests {
     fn parse_invalid_gear_type() {
         let invalid_type_id = DofusDbTypeId(-2);
         assert_eq!(
-            parse_gear_type(invalid_type_id),
-            Err(String::from("Unknown gear id -2"))
+            Err(String::from("Unknown gear id -2")),
+            parse_gear_type(invalid_type_id)
         );
     }
 
@@ -121,8 +118,8 @@ mod tests {
         for characteristic_type in ALL_CHARACTERISTIC_TYPES {
             let type_id = DofusDbCharacteristicTypeId::from(characteristic_type);
             assert_eq!(
-                parse_characteristic_type(type_id),
-                Ok(characteristic_type.clone())
+                Ok(characteristic_type.clone()),
+                parse_characteristic_type(type_id)
             );
         }
     }
@@ -131,15 +128,14 @@ mod tests {
     fn parse_invalid_characteristic_type() {
         let invalid_type_id = DofusDbCharacteristicTypeId(-2);
         assert_eq!(
-            parse_characteristic_type(invalid_type_id),
-            Err(String::from("Unknown characteristic type id -2"))
+            Err(String::from("Unknown characteristic type id -2")),
+            parse_characteristic_type(invalid_type_id)
         );
     }
 
     #[test]
     fn parse_valid_characteristics() {
         assert_eq!(
-            parse_characteristics(vec![VITALITY, POWER]),
             Ok(vec![
                 CharacteristicRange {
                     kind: CharacteristicType::Vitality,
@@ -151,15 +147,16 @@ mod tests {
                     min: -5,
                     max: 15,
                 },
-            ])
+            ]),
+            parse_characteristics(vec![VITALITY, POWER])
         )
     }
 
     #[test]
     fn parse_characteristics_do_not_discard_invalid() {
         assert_eq!(
-            parse_characteristics(vec![VITALITY, UNKNOWN]),
-            Err(String::from("Unknown characteristic type id 99"))
+            Err(String::from("Unknown characteristic type id 99")),
+            parse_characteristics(vec![VITALITY, UNKNOWN])
         )
     }
 
@@ -250,7 +247,7 @@ mod tests {
             ],
         };
 
-        assert_eq!(gear, Ok(expected_gear));
+        assert_eq!(Ok(expected_gear), gear);
 
         Ok(())
     }
@@ -260,6 +257,7 @@ mod tests {
         let invalid_type_id = -999;
 
         assert_eq!(
+            Err(format!("Unknown gear id {}", invalid_type_id)),
             parse_gear(DofusDbObject {
                 name: TranslatedString {
                     en: String::from("Invalid Gear"),
@@ -269,8 +267,7 @@ mod tests {
                 level: 1,
                 img: String::from("invalid_gear.png"),
                 effects: vec![VITALITY],
-            }),
-            Err(format!("Unknown gear id {}", invalid_type_id))
+            })
         );
 
         Ok(())
@@ -279,6 +276,7 @@ mod tests {
     #[test]
     fn parse_gear_fails_if_invalid_effect() -> Result<()> {
         assert_eq!(
+            Err(String::from("Unknown characteristic type id 99")),
             parse_gear(DofusDbObject {
                 name: TranslatedString {
                     en: String::from("Studded Belt of Death"),
@@ -288,13 +286,130 @@ mod tests {
                 level: 50,
                 img: String::from("studded_belt_of_death.png"),
                 effects: vec![VITALITY, POWER, UNKNOWN],
-            }),
-            Err(String::from("Unknown characteristic type id 99"))
+            })
         );
 
         Ok(())
     }
 
-    // #[test]
-    // parse_gears test with multiple gears, reusing test gear structures....
+    #[test]
+    fn can_parse_multiple_gears() -> Result<()> {
+        let expected_gears = vec![
+            Gear {
+                name: String::from("Studded Belt of Death"),
+                gear_type: GearType::Belt,
+                level: 50,
+                characteristics: vec![CharacteristicRange {
+                    kind: CharacteristicType::Vitality,
+                    min: 10,
+                    max: 20,
+                }],
+            },
+            Gear {
+                name: String::from("Studded Belt"),
+                gear_type: GearType::Belt,
+                level: 20,
+                characteristics: vec![CharacteristicRange {
+                    kind: CharacteristicType::Vitality,
+                    min: 10,
+                    max: 20,
+                }],
+            },
+        ];
+
+        let objects_to_parse = vec![
+            DofusDbObject {
+                name: TranslatedString {
+                    en: String::from("Studded Belt of Death"),
+                    fr: String::from("Ceinture Cloutée de la Mort"),
+                },
+                typeId: 30,
+                level: 50,
+                img: String::from("studded_belt_of_death.png"),
+                effects: vec![VITALITY],
+            },
+            DofusDbObject {
+                name: TranslatedString {
+                    en: String::from("Studded Belt"),
+                    fr: String::from("Ceinture Cloutée"),
+                },
+                typeId: 30,
+                level: 20,
+                img: String::from("studded_belt.png"),
+                effects: vec![VITALITY],
+            },
+        ];
+
+        assert_eq!(
+            expected_gears,
+            parse_gears(&GearType::Belt, objects_to_parse)
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn can_parse_multiple_gears_discarding_an_invalid_gear() -> Result<()> {
+        let expected_gears = vec![
+            Gear {
+                name: String::from("Studded Belt of Death"),
+                gear_type: GearType::Belt,
+                level: 50,
+                characteristics: vec![CharacteristicRange {
+                    kind: CharacteristicType::Vitality,
+                    min: 10,
+                    max: 20,
+                }],
+            },
+            Gear {
+                name: String::from("Studded Belt"),
+                gear_type: GearType::Belt,
+                level: 20,
+                characteristics: vec![CharacteristicRange {
+                    kind: CharacteristicType::Vitality,
+                    min: 10,
+                    max: 20,
+                }],
+            },
+        ];
+
+        let objects_to_parse = vec![
+            DofusDbObject {
+                name: TranslatedString {
+                    en: String::from("Studded Belt of Death"),
+                    fr: String::from("Ceinture Cloutée de la Mort"),
+                },
+                typeId: 30,
+                level: 50,
+                img: String::from("studded_belt_of_death.png"),
+                effects: vec![VITALITY],
+            },
+            DofusDbObject {
+                name: TranslatedString {
+                    en: String::from("Studded Belt of Death"),
+                    fr: String::from("Ceinture Cloutée de la Mort"),
+                },
+                typeId: 30,
+                level: 50,
+                img: String::from("studded_belt_of_death.png"),
+                effects: vec![VITALITY, POWER, UNKNOWN],
+            },
+            DofusDbObject {
+                name: TranslatedString {
+                    en: String::from("Studded Belt"),
+                    fr: String::from("Ceinture Cloutée"),
+                },
+                typeId: 30,
+                level: 20,
+                img: String::from("studded_belt.png"),
+                effects: vec![VITALITY],
+            },
+        ];
+
+        assert_eq!(
+            expected_gears,
+            parse_gears(&GearType::Belt, objects_to_parse)
+        );
+        Ok(())
+    }
 }

@@ -8,7 +8,7 @@
 // use packagename::... refers to the library's module hierarchy
 // use crate::...       refers to the binary's own module hierarchy
 use anyhow::Result;
-use dofus_opti::dofus_db_import::fetch_and_save_all_gears;
+use dofus_opti::dofus_db_import::{IMPORT_PATH, fetch_and_save_all_gears};
 use dofus_opti::models::ALL_GEAR_TYPES;
 use std::time::Instant;
 
@@ -19,7 +19,7 @@ async fn main() -> Result<()> {
 
     // Calling it sequentially
     for gear_type in ALL_GEAR_TYPES {
-        if let Err(e) = fetch_and_save_all_gears(gear_type).await {
+        if let Err(e) = fetch_and_save_all_gears(IMPORT_PATH, gear_type).await {
             eprintln!("❌ Failed to process gear_type {}: {}", gear_type, e);
         } else {
             println!("✅ Successfully processed gear_type {}", gear_type);

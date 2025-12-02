@@ -7,6 +7,7 @@ pub mod dofus_db_models;
 pub mod dofus_db_parser;
 pub mod models;
 pub mod dofus_db_import;
+pub mod dofus_db_export;
 
 // Code to share across binaries
 pub mod superceded;

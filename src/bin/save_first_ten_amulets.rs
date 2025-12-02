@@ -44,7 +44,7 @@ pub fn save_dofus_db_data_2(
     let out_dir = Path::new("dofus_db/data2");
     fs::create_dir_all(out_dir)?;
     for (i, object) in objects.iter().enumerate() {
-        let object_name = get_object_name(object, i);
+        let object_name = get_object_name(object, &|o| &o["name"]["en"], i);
         let file_name = create_filename(&gear_type, &object_name);
         let file_path = out_dir.join(file_name);
         let json_str = serde_json::to_string_pretty(object)?;

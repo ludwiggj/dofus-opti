@@ -17,7 +17,7 @@ pub struct GetObjectsResponse {
     pub data: Vec<serde_json::Value>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct DofusDbObject {
     pub name: TranslatedString,
     pub typeId: i32,
@@ -26,13 +26,13 @@ pub struct DofusDbObject {
     pub effects: Vec<Effect>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct TranslatedString {
     pub en: String,
     pub fr: String
 }
 
-#[derive(Debug, Deserialize, Copy, Clone)]
+#[derive(Debug, Deserialize, Copy, Clone, PartialEq)]
 pub struct Effect {
     pub from: i32,
     pub to: i32,

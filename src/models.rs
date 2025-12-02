@@ -5,8 +5,9 @@
 // names of dependencies are available at the top level.
 
 use std::fmt;
+use serde::Serialize;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub struct Gear {
     pub name: String,
     pub gear_type: GearType,
@@ -14,7 +15,7 @@ pub struct Gear {
     pub characteristics: Vec<CharacteristicRange>,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum GearType {
     Amulet,
     Axe,
@@ -43,14 +44,14 @@ impl fmt::Display for GearType {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub struct CharacteristicRange {
     pub kind: CharacteristicType,
     pub min: i32,
     pub max: i32,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum CharacteristicType {
     AbilityPoint,
     AbilityPointParry,

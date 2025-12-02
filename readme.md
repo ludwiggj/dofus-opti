@@ -19,3 +19,5 @@ Based on Rust series posted at [Rust Jobs Blog](https://rustjobs.dev/blog/).
 
 - [What does "cannot move out of index" mean?](https://stackoverflow.com/questions/27904864/what-does-cannot-move-out-of-index-of-mean)
 - [Rust FizzBuzz](https://chrismorgan.info/blog/rust-fizzbuzz/)
+- [Adding an element to an immutable vector](https://stackoverflow.com/questions/71165771/add-element-to-immutable-vector-rust)
+- [Why does Rust have eq and partialeq?](https://www.reddit.com/r/rust/comments/t8d6wb/why_does_rust_have_eq_and_partialeq/)
