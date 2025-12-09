@@ -1,5 +1,3 @@
 /target
 .idea
 Cargo.lock
-dofus_db
-core
