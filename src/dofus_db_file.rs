@@ -114,11 +114,6 @@ pub fn read_gears<P: AsRef<Path>>(
     Ok(gears)
 }
 
-pub fn read_json<P: AsRef<Path>>(path: P) -> Result<JsonValue> {
-    let file_content = fs::read_to_string(path)?;
-    let json_value: JsonValue = serde_json::from_str(&file_content)?;
-    Ok(json_value)
-}
 
 #[cfg(test)]
 mod tests {

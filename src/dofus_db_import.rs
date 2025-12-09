@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use crate::dofus_db_client::fetch_all_gears;
 use crate::dofus_db_file::{filename_safe_string, read_gears, save_json_gears};
 use crate::dofus_db_models::DofusDbObject;
-use crate::dofus_db_parser::parse_gears;
+use dofus_db::parser::parse_gears;
 use crate::models::{Gear, GearType};
 
 pub const IMPORT_PATH: &str = "dofus_db/data";

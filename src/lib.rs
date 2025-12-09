@@ -1,10 +1,9 @@
 // When the crate is compiled, the first step is to compile the library.
 
 // The following modules are part of the library
-pub mod dofus_db_file;
-pub mod dofus_db_parser;
 pub mod dofus_db_import;
 pub mod dofus_db_export;
+pub mod dofus_db_file;
 
 // Re-export models from core crate
 pub mod models {

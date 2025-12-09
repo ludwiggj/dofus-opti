@@ -1,7 +1,7 @@
 use anyhow::Result;
 use crate::dofus_db_file::{read_gears, save_gears};
 use crate::dofus_db_models::DofusDbObject;
-use crate::dofus_db_parser::parse_gears;
+use dofus_db::parser::parse_gears;
 use crate::models::{Gear, GearType};
 
 pub const EXPORT_PATH: &str = "core/data";
