@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 core = { path = "../core" }
+dofus_db = { path = "../dofus_db" }
 anyhow = { workspace = true }
 tokio = { workspace = true }
 reqwest = { workspace = true }
