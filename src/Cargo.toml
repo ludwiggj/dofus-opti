@@ -1,0 +1,24 @@
+[package]
+name = "dofus-opti-legacy"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core = { path = "../core" }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+futures = { workspace = true }
+tempfile = { workspace = true }
+clap = { workspace = true }
+
+[[bin]]
+name = "dofus-opti"
+path = "main.rs"
+
+[lib]
+name = "dofus_opti"
+path = "lib.rs"
+

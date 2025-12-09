@@ -5,9 +5,10 @@ pub mod dofus_db_client;
 pub mod dofus_db_file;
 pub mod dofus_db_models;
 pub mod dofus_db_parser;
-pub mod models;
 pub mod dofus_db_import;
 pub mod dofus_db_export;
 
-// Code to share across binaries
-pub mod superceded;
+// Re-export models from core crate
+pub mod models {
+    pub use core::*;
+}
