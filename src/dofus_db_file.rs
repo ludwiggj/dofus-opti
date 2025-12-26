@@ -1,10 +1,39 @@
-use crate::dofus_db_models::*;
-use crate::models::{Gear, GearType};
 use anyhow::Result;
 use serde::Deserialize;
 use serde_json::Value as JsonValue;
 use std::fs;
 use std::path::Path;
+use core::model::{Gear, GearType};
+use dofus_db::model::*;
+
+use serde::Serialize;
+use anyhow::Context;
+
+pub fn write_objects<P, A, F>(
+    base_path: P,
+    folder_name: String,
+    objects: &Vec<A>,
+    get_file_name: F,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+    A: Serialize,
+    F: Fn(&A, usize) -> String,
+{
+    let out_dir = base_path.as_ref().join(folder_name);
+    fs::create_dir_all(&out_dir).context("Failed to create output dir")?;
+
+    for (i, object) in objects.iter().enumerate() {
+        let file_name = get_file_name(&object, i);
+        let file_path = out_dir.join(file_name);
+
+        let json_str = serde_json::to_string_pretty(object)?;
+
+        fs::write(file_path, json_str).context("Failed to write json file")?;
+    }
+
+    Ok(())
+}
 
 pub fn get_object_name<F>(object: &JsonValue, file_name_field: &F, index: usize) -> String
 where
@@ -118,7 +147,7 @@ pub fn read_gears<P: AsRef<Path>>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dofus_db_models::{DofusDbCharacteristicTypeId, Effect};
+    use dofus_db::model::{DofusDbCharacteristicTypeId, Effect};
     use tempfile::TempDir;
 
     #[test]

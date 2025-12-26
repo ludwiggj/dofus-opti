@@ -18,8 +18,3 @@ clap = { workspace = true }
 [[bin]]
 name = "dofus-opti"
 path = "main.rs"
-
-[lib]
-name = "dofus_opti"
-path = "lib.rs"
-

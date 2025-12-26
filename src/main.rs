@@ -5,15 +5,19 @@
 // The library is already built at this point, and the library is technically a
 // dependency of the binary.
 
+mod dofus_db_export;
+mod dofus_db_import;
+mod dofus_db_file;
+
 // use packagename::... refers to the library's module hierarchy
 // use crate::...       refers to the binary's own module hierarchy
 use anyhow::Result;
 use clap::Parser;
-use dofus_opti::dofus_db_export::{export_parsed_data, EXPORT_PATH};
-use dofus_opti::dofus_db_import::{fetch_and_save_all_gears, IMPORT_PATH};
-use dofus_opti::models::ALL_GEAR_TYPES;
 use futures::{stream, StreamExt};
 use std::time::Instant;
+use crate::dofus_db_export::{export_parsed_data, EXPORT_PATH};
+use crate::dofus_db_import::{fetch_and_save_all_gears, IMPORT_PATH};
+use core::model::ALL_GEAR_TYPES;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]

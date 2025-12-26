@@ -1,12 +1,12 @@
 use anyhow::Result;
 use serde_json::Value as JsonValue;
-use serde::Deserialize;
 use std::collections::HashSet;
-use crate::dofus_db_client::fetch_all_gears;
+use serde::Deserialize;
 use crate::dofus_db_file::{filename_safe_string, read_gears, save_json_gears};
-use crate::dofus_db_models::DofusDbObject;
+use core::model::{Gear, GearType};
+use dofus_db::client::fetch_all_gears;
+use dofus_db::model::DofusDbObject;
 use dofus_db::parser::parse_gears;
-use crate::models::{Gear, GearType};
 
 pub const IMPORT_PATH: &str = "dofus_db/data";
 
