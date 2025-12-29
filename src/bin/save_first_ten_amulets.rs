@@ -12,6 +12,8 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 use anyhow::Result;
+
+// This can import publicly declared modules from the library
 use dofus_opti::dofus_db_file::{create_filename, get_object_name};
 use dofus_opti::dofus_db_models::DofusDbObject;
 use dofus_opti::dofus_db_parser::parse_gear;

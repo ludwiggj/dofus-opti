@@ -8,29 +8,23 @@
 // use packagename::... refers to the library's module hierarchy
 // use crate::...       refers to the binary's own module hierarchy
 use anyhow::Result;
-use clap::Parser;
 use dofus_opti::dofus_db_export::{export_parsed_data, EXPORT_PATH};
 use dofus_opti::dofus_db_import::{fetch_and_save_all_gears, IMPORT_PATH};
 use dofus_opti::models::ALL_GEAR_TYPES;
 use futures::{stream, StreamExt};
 use std::time::Instant;
+use clap::Parser;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    // Import data from Dofus DB site and save locally
-    #[arg(short = 'i', long = "import")]
-    import: bool,
+// The following modules are part of the binary only
+// They cannot be used by the library itself, or rust code that imports this library
+// Although pub can be used here, it's best practice not to, since no external code
+// can import from the binary crate
+mod args;
 
-    // Parse local DofusDB json files into Rust models and export them
-    #[arg(short = 'e', long = "export")]
-    export: bool,
-}
+use args::Args;
 
 // cargo run --bin dofus-opti -- -e
 // cargo run --bin dofus-opti -- -i
-
-// See https://www.sheshbabu.com/posts/rust-module-system/ for description of module system
 #[tokio::main]
 async fn main() -> Result<()> {
     let now = Instant::now();

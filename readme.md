@@ -21,3 +21,4 @@ Based on Rust series posted at [Rust Jobs Blog](https://rustjobs.dev/blog/).
 - [Rust FizzBuzz](https://chrismorgan.info/blog/rust-fizzbuzz/)
 - [Adding an element to an immutable vector](https://stackoverflow.com/questions/71165771/add-element-to-immutable-vector-rust)
 - [Why does Rust have eq and partialeq?](https://www.reddit.com/r/rust/comments/t8d6wb/why_does_rust_have_eq_and_partialeq/)
+- [Description of Rust module system](https://www.sheshbabu.com/posts/rust-module-system/)
