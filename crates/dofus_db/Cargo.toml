@@ -6,7 +6,14 @@ edition = "2024"
 [dependencies]
 core = { path = "../core" }
 anyhow = { workspace = true }
+clap = { workspace = true }
+futures = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tempfile = { workspace = true }
+tokio = { workspace = true }
+
+[[bin]]
+name = "dofus-opti"
+path = "../dofus_db/src/main.rs"
