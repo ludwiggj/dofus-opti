@@ -3,10 +3,10 @@ use serde_json::{Value as JsonValue, Value};
 use std::collections::HashSet;
 use serde::Deserialize;
 use core::model::{Gear, GearType};
-use dofus_db::client::fetch_all_gears;
+use crate::client::fetch_all_gears;
 use core::file::{filename_safe_string, read_gears, write_objects};
-use dofus_db::model::DofusDbObject;
-use dofus_db::parser::parse_gears;
+use crate::model::DofusDbObject;
+use crate::parser::parse_gears;
 
 pub const IMPORT_PATH: &str = "data/import";
 

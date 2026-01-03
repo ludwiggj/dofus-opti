@@ -2,8 +2,8 @@ use anyhow::Result;
 use serde_json::Value;
 use core::model::{Gear, GearType};
 use core::file::{read_gears, save_gears};
-use dofus_db::model::DofusDbObject;
-use dofus_db::parser::parse_gears;
+use crate::model::DofusDbObject;
+use crate::parser::parse_gears;
 
 pub const EXPORT_PATH: &str = "data/export";
 
