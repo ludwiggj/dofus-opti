@@ -1,13 +1,25 @@
 use anyhow::Result;
-use serde::Deserialize;
 use serde_json::{Value as JsonValue};
 use std::fs;
 use std::path::Path;
-use core::model::{Gear, GearType};
+use crate::model::{Gear, GearType};
 
 use serde::Serialize;
 use anyhow::Context;
-use crate::model::DofusDbObject;
+use serde::de::DeserializeOwned;
+
+// use crate::model::{DofusDbCharacteristicTypeId, Effect, TranslatedString};
+// This function returns a closure type fn(&Value, usize) -> String, which is a function pointer.
+// The Rust compiler can infer that the closure |o, i| ... matches this signature.
+// fn file_name_orig() -> fn(&Value, usize) -> String {
+//     |o, i| (&o["name"]).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
+// }
+
+// In this case, the closure |o, i| get_name(o)... captures the get_name parameter from the outer
+// function scope. A closure that captures variables cannot be coerced into a function pointer.
+pub fn file_name(get_name: fn (&JsonValue) -> &JsonValue) -> impl Fn(&JsonValue, usize) -> String {
+    move |o, i| get_name(o).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
+}
 
 pub fn save_gears<P: AsRef<Path>, F>(
     base_path: P,
@@ -63,13 +75,17 @@ where
     Ok(())
 }
 
-pub fn read_gears<P: AsRef<Path>>(
+pub fn read_gears<P, A>(
     base_path: P,
     gear_type: &GearType,
-) -> Result<Vec<DofusDbObject>> {
+) -> Result<Vec<A>>
+where
+    P: AsRef<Path>,
+    A: DeserializeOwned
+{
     let in_dir_path = base_path.as_ref().join(gear_type.to_string());
     let in_dir_path_name = in_dir_path.as_path().to_str().unwrap_or("unknown_path");
-    let mut gears: Vec<DofusDbObject> = vec![];
+    let mut gears: Vec<A> = vec![];
     for entry in fs::read_dir(in_dir_path.clone())? {
         let entry = entry?;
         let path = entry.path();
@@ -78,7 +94,7 @@ pub fn read_gears<P: AsRef<Path>>(
             match file_content {
                 Ok(content) => {
                     let json_value: JsonValue = serde_json::from_str(&content)?;
-                    match DofusDbObject::deserialize(json_value) {
+                    match A::deserialize(json_value) {
                         Err(e) => println!(
                             "❌ Failed to deserialize contents of file {}, {}",
                             path.display(),
@@ -108,18 +124,7 @@ pub fn read_gears<P: AsRef<Path>>(
 mod tests {
     use super::*;
     use tempfile::tempdir_in;
-    use crate::model::{DofusDbCharacteristicTypeId, Effect, TranslatedString};
-    // This function returns a closure type fn(&Value, usize) -> String, which is a function pointer.
-    // The Rust compiler can infer that the closure |o, i| ... matches this signature.
-    // fn file_name_orig() -> fn(&Value, usize) -> String {
-    //     |o, i| (&o["name"]).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
-    // }
-
-    // In this case, the closure |o, i| get_name(o)... captures the get_name parameter from the outer
-    // function scope. A closure that captures variables cannot be coerced into a function pointer.
-    fn file_name(get_name: fn (&JsonValue) -> &JsonValue) -> impl Fn(&JsonValue, usize) -> String {
-        move |o, i| get_name(o).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
-    }
+    use crate::model::{CharacteristicRange, CharacteristicType};
 
     #[test]
     fn get_object_name_with_english_name() -> Result<()> {
@@ -151,55 +156,27 @@ mod tests {
 
     #[test]
     fn write_read_gears() -> Result<()> {
-        // r# negates need to escape quotes in JSON strings
-        let json_1 = r#"{
-  "name": {
-    "en": "Great Amulet",
-    "fr": "Grande Amulette"
-  },
-  "typeId": 1,
-  "level": 60,
-  "img": "https://api.dofusdb.fr/img/items/img.png",
-  "effects": [{
-    "category": 0,
-    "characteristic": 11,
-    "effectId": 125,
-    "elementId": -1,
-    "from": 31,
-    "to": 50
-  }]
-}"#;
-
-        let json_values: Vec<JsonValue> = vec![json_1]
-            .into_iter()
-            .map(serde_json::from_str)
-            .collect::<Result<Vec<JsonValue>, _>>()?;
-
-        let binding = tempdir_in("../../..")?;
-        let base_dir = binding.path();
-        let gear_type = GearType::Amulet;
-        let folder_name = gear_type.to_string().to_lowercase();
-
-        let expected_dofus_db_objects: Vec<DofusDbObject> = vec![DofusDbObject {
-            name: TranslatedString {
-                en: "Great Amulet".to_string(),
-                fr: "Grande Amulette".to_string(),
-            },
-            typeId: 1,
+        let gear =  Gear {
+            name: "Great Amulet".to_string(),
+            gear_type: GearType::Amulet,
             level: 60,
-            img: "https://api.dofusdb.fr/img/items/img.png".to_string(),
-            effects: vec![Effect {
-                characteristic: DofusDbCharacteristicTypeId(11),
-                from: 31,
-                to: 50,
+            characteristics: vec![CharacteristicRange {
+                kind: CharacteristicType::AbilityPoint,
+                min: 31,
+                max: 50,
             }],
-        }];
+        };
 
-        write_objects(&base_dir, folder_name, &json_values, file_name(|o| &o["name"]["en"]))?;
+        let gears: Vec<Gear> = vec![gear];
 
-        let read_json_values = read_gears(&base_dir, &gear_type)?;
+        let binding = tempdir_in(".")?;
+        let base_dir = binding.path();
 
-        assert_eq!(expected_dofus_db_objects, read_json_values);
+        save_gears(&base_dir, &GearType::Amulet, &gears, file_name(|o| &o["name"]["en"]))?;
+
+        let restored_gears = read_gears(&base_dir, &GearType::Amulet)?;
+
+        assert_eq!(gears, restored_gears);
         Ok(())
     }
 }

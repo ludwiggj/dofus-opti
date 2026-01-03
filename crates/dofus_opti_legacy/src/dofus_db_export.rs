@@ -1,7 +1,7 @@
 use anyhow::Result;
 use serde_json::Value;
 use core::model::{Gear, GearType};
-use dofus_db::dofus_db_file::{read_gears, save_gears};
+use core::file::{read_gears, save_gears};
 use dofus_db::model::DofusDbObject;
 use dofus_db::parser::parse_gears;
 

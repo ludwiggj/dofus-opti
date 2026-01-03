@@ -6,9 +6,9 @@
 
 // Core models for dofus-opti
 use std::fmt;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Gear {
     pub name: String,
     pub gear_type: GearType,
@@ -16,7 +16,7 @@ pub struct Gear {
     pub characteristics: Vec<CharacteristicRange>,
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum GearType {
     Amulet,
     Axe,
@@ -45,14 +45,14 @@ impl fmt::Display for GearType {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct CharacteristicRange {
     pub kind: CharacteristicType,
     pub min: i32,
     pub max: i32,
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum CharacteristicType {
     AbilityPoint,
     AbilityPointParry,

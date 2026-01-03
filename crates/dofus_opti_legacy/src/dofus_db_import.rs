@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use serde::Deserialize;
 use core::model::{Gear, GearType};
 use dofus_db::client::fetch_all_gears;
-use dofus_db::dofus_db_file::{filename_safe_string, read_gears, write_objects};
+use core::file::{filename_safe_string, read_gears, write_objects};
 use dofus_db::model::DofusDbObject;
 use dofus_db::parser::parse_gears;
 
@@ -87,7 +87,7 @@ pub async fn fetch_and_save_all_gears(dofus_db_export_path: &str, gear_type: &Ge
         file_name(),
     )?;
 
-    read_gears(dofus_db_export_path, gear_type)?;
+    read_gears::<&str, DofusDbObject>(dofus_db_export_path, gear_type)?;
     
     Ok(())
 }
