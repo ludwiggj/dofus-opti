@@ -158,7 +158,11 @@ mod tests {
 
     #[test]
     fn parse_golden_gear() -> Result<()> {
-        let file_path = Path::new("src/golden").join("amulet_gargandyas_necklace.json");
+        let file_path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("src")
+            .join("golden")
+            .join("amulet_gargandyas_necklace.json");
+
         let json = read_json(file_path)?;
 
         let dofus_db_object: DofusDbObject = serde_json::from_value(json)?;

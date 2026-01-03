@@ -10,7 +10,7 @@ Based on Rust series posted at [Rust Jobs Blog](https://rustjobs.dev/blog/).
 - [Episode 4 - Storing Data Locally](https://rustjobs.dev/blog/episode-4-storing-data-locally/)
 - [Episode 5 - Scraping the Whole Dofus Encyclopedia](https://rustjobs.dev/blog/episode-5-scraping-the-whole-dofus-encyclopedia/)
 - [Episode 6 - Testing in Rust — Because Even Pet Projects Deserve Some Love](https://rustjobs.dev/blog/episode-6-unit-testing-in-rust/)
-- [Episode 7: Completing the Model & Wiring a CLI](https://rustjobs.dev/blog/episode-7-completing-the-model-and-wiring-a-cli/)
+- [Episode 7 - Completing the Model & Wiring a CLI](https://rustjobs.dev/blog/episode-7-completing-the-model-and-wiring-a-cli/)
 
 ## Next up:
 

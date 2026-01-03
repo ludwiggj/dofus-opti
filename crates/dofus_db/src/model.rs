@@ -7,13 +7,13 @@
 #![allow(non_snake_case)]
 
 use serde::Deserialize;
-use crate::models::{CharacteristicType, GearType};
+use core::model::{CharacteristicType, GearType};
 
 #[derive(Debug, Deserialize)]
 pub struct GetObjectsResponse {
-    total: u32,
-    limit: u32,
-    skip: u32,
+    pub total: u32,
+    pub limit: u32,
+    pub skip: u32,
     pub data: Vec<serde_json::Value>
 }
 

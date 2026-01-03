@@ -5,15 +5,18 @@
 // The library is already built at this point, and the library is technically a
 // dependency of the binary.
 
+mod dofus_db_export;
+mod dofus_db_import;
+
 // use packagename::... refers to the library's module hierarchy
 // use crate::...       refers to the binary's own module hierarchy
 use anyhow::Result;
 use clap::Parser;
-use dofus_opti::dofus_db_export::{export_parsed_data, EXPORT_PATH};
-use dofus_opti::dofus_db_import::{fetch_and_save_all_gears, IMPORT_PATH};
-use dofus_opti::models::ALL_GEAR_TYPES;
 use futures::{stream, StreamExt};
 use std::time::Instant;
+use crate::dofus_db_export::{export_parsed_data, EXPORT_PATH};
+use crate::dofus_db_import::{fetch_and_save_all_gears, IMPORT_PATH};
+use core::model::ALL_GEAR_TYPES;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -27,8 +30,8 @@ struct Args {
     export: bool,
 }
 
-// cargo run --bin dofus-opti -- -e
 // cargo run --bin dofus-opti -- -i
+// cargo run --bin dofus-opti -- -e
 
 // See https://www.sheshbabu.com/posts/rust-module-system/ for description of module system
 #[tokio::main]
@@ -53,10 +56,16 @@ async fn main() -> Result<()> {
     if args.import {
         println!("Importing data from Dofus DB site...");
         fetch_and_save().await;
+
+        // TODO Cases of paths
+        // ✅ Written 383 entry/ies to directory data/import/ring
+        // ✅ Successfully read 383 entries from data/import/Ring into json
+        // ✅ Successfully processed gear_type Ring
     }
 
     // read, parse, write out our model representation
     // Example layout:
+    // TODO - Adjust paths as needed
     //
     // core/
     // └── data/
@@ -85,6 +94,12 @@ async fn main() -> Result<()> {
     if args.export {
         println!("Exporting Dofus DB data to our model...");
         export_data().await;
+
+        // TODO Cases of paths
+        // ✅ Successfully read 328 entries from data/import/Amulet into json
+        // ✅ Successfully parsed 328/328 from DofusDbObject into Amulet
+        // ✅ Written 328 entry/ies to directory data/export/amulet
+        // ✅ Successfully processed gear_type Amulet
     }
 
     if !args.import && !args.export {

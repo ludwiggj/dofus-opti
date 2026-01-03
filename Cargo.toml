@@ -1,10 +1,6 @@
 [workspace]
-resolver = "2"
-members = [
-    "core",
-    "dofus_db",
-    "src",
-]
+resolver = "3"
+members = ["crates/*"]
 
 [workspace.dependencies]
 anyhow = "1.0"

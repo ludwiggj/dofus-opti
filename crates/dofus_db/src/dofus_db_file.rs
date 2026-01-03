@@ -1,31 +1,13 @@
-use crate::dofus_db_models::*;
-use crate::models::{Gear, GearType};
 use anyhow::Result;
 use serde::Deserialize;
-use serde_json::Value as JsonValue;
+use serde_json::{Value as JsonValue};
 use std::fs;
 use std::path::Path;
+use core::model::{Gear, GearType};
 
-pub fn get_object_name<F>(object: &JsonValue, file_name_field: &F, index: usize) -> String
-where
-    F: Fn(&JsonValue) -> &JsonValue,
-{
-    file_name_field(object)
-        .as_str()
-        .map(String::from)
-        .unwrap_or(format!("unknown_{}", index))
-}
-
-pub fn filename_safe_string(s: &str) -> String {
-    s.to_lowercase()
-        .replace(" ", "_")
-        .replace("-", "_")
-        .replace("'s", "")
-}
-
-pub fn create_filename(gear_type: &GearType, object_name: &str) -> String {
-    filename_safe_string(&format!("{gear_type}_{object_name}.json"))
-}
+use serde::Serialize;
+use anyhow::Context;
+use crate::model::DofusDbObject;
 
 pub fn save_gears<P: AsRef<Path>, F>(
     base_path: P,
@@ -34,7 +16,7 @@ pub fn save_gears<P: AsRef<Path>, F>(
     file_name_field: F,
 ) -> Result<()>
 where
-    F: Fn(&JsonValue) -> &JsonValue,
+    F: Fn(&JsonValue, usize) -> String,
 {
     // Convert gears to JsonValues
     let gear_json: Vec<JsonValue> = gears
@@ -42,34 +24,41 @@ where
         .filter_map(|g| serde_json::to_value(g).ok())
         .collect();
 
-    save_json_gears(base_path, gear_type, &gear_json, file_name_field)
+    write_objects(base_path, gear_type.to_string().to_lowercase(), &gear_json, file_name_field)
 }
 
-pub fn save_json_gears<P: AsRef<Path>, F>(
+pub fn filename_safe_string(s: String) -> String {
+    s.to_lowercase()
+        .replace(" ", "_")
+        .replace("-", "_")
+        .replace("'s", "")
+}
+
+pub fn write_objects<P, A, F>(
     base_path: P,
-    gear_type: &GearType,
-    gears: &Vec<JsonValue>,
-    file_name_field: F,
+    folder_name: String,
+    objects: &Vec<A>,
+    get_file_name: F,
 ) -> Result<()>
 where
-    F: Fn(&JsonValue) -> &JsonValue,
+    P: AsRef<Path>,
+    A: Serialize,
+    F: Fn(&A, usize) -> String,
 {
-    let out_dir_path = base_path
-        .as_ref()
-        .join(gear_type.to_string().to_lowercase());
-    fs::create_dir_all(out_dir_path.clone())?;
-    for (i, object) in gears.iter().enumerate() {
-        let object_name = get_object_name(object, &file_name_field, i);
-        let file_name = create_filename(gear_type, &object_name);
-        let file_path = out_dir_path.join(file_name);
+    let out_dir = base_path.as_ref().join(folder_name);
+    fs::create_dir_all(&out_dir).context("Failed to create output dir")?;
+
+    for (i, object) in objects.iter().enumerate() {
+        let file_name = get_file_name(&object, i);
+        let file_path = out_dir.join(filename_safe_string(file_name));
         let json_str = serde_json::to_string_pretty(object)?;
-        fs::write(file_path, json_str)?;
+        fs::write(file_path, json_str).context("Failed to write json file")?;
     }
+
     println!(
-        "✅ Written {} entry/ies of gear type {} to directory {}",
-        gears.len(),
-        gear_type,
-        out_dir_path.to_str().unwrap_or_default()
+        "✅ Written {} entry/ies to directory {}",
+        objects.len(),
+        out_dir.to_str().unwrap_or_default()
     );
     Ok(())
 }
@@ -118,8 +107,19 @@ pub fn read_gears<P: AsRef<Path>>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dofus_db_models::{DofusDbCharacteristicTypeId, Effect};
-    use tempfile::TempDir;
+    use tempfile::tempdir_in;
+    use crate::model::{DofusDbCharacteristicTypeId, Effect, TranslatedString};
+    // This function returns a closure type fn(&Value, usize) -> String, which is a function pointer.
+    // The Rust compiler can infer that the closure |o, i| ... matches this signature.
+    // fn file_name_orig() -> fn(&Value, usize) -> String {
+    //     |o, i| (&o["name"]).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
+    // }
+
+    // In this case, the closure |o, i| get_name(o)... captures the get_name parameter from the outer
+    // function scope. A closure that captures variables cannot be coerced into a function pointer.
+    fn file_name(get_name: fn (&JsonValue) -> &JsonValue) -> impl Fn(&JsonValue, usize) -> String {
+        move |o, i| get_name(o).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
+    }
 
     #[test]
     fn get_object_name_with_english_name() -> Result<()> {
@@ -128,7 +128,7 @@ mod tests {
         let dummy_index = 0;
 
         assert_eq!(
-            get_object_name(&json_value, &|o| &o["name"]["en"], dummy_index),
+            file_name(|o| &o["name"]["en"])(&json_value, dummy_index),
             String::from("Great Amulet")
         );
 
@@ -142,7 +142,7 @@ mod tests {
         let dummy_index = 0;
 
         assert_eq!(
-            get_object_name(&json_value, &|o| &o["name"]["en"], dummy_index),
+            file_name(|o| &o["name"]["en"])(&json_value, dummy_index),
             format!("unknown_{dummy_index}")
         );
 
@@ -175,9 +175,10 @@ mod tests {
             .map(serde_json::from_str)
             .collect::<Result<Vec<JsonValue>, _>>()?;
 
-        let temp_dir = TempDir::new()?;
-        let base_dir = temp_dir.path();
+        let binding = tempdir_in("../../..")?;
+        let base_dir = binding.path();
         let gear_type = GearType::Amulet;
+        let folder_name = gear_type.to_string().to_lowercase();
 
         let expected_dofus_db_objects: Vec<DofusDbObject> = vec![DofusDbObject {
             name: TranslatedString {
@@ -194,7 +195,8 @@ mod tests {
             }],
         }];
 
-        save_json_gears(&base_dir, &gear_type, &json_values, |o| &o["name"]["en"])?;
+        write_objects(&base_dir, folder_name, &json_values, file_name(|o| &o["name"]["en"]))?;
+
         let read_json_values = read_gears(&base_dir, &gear_type)?;
 
         assert_eq!(expected_dofus_db_objects, read_json_values);

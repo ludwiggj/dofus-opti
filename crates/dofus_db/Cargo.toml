@@ -1,15 +1,12 @@
 [package]
 name = "dofus_db"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2024"
 
 [dependencies]
 core = { path = "../core" }
 anyhow = { workspace = true }
-tokio = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-futures = { workspace = true }
 tempfile = { workspace = true }
-
