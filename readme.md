@@ -11,10 +11,10 @@ Based on Rust series posted at [Rust Jobs Blog](https://rustjobs.dev/blog/).
 - [Episode 5 - Scraping the Whole Dofus Encyclopedia](https://rustjobs.dev/blog/episode-5-scraping-the-whole-dofus-encyclopedia/)
 - [Episode 6 - Testing in Rust — Because Even Pet Projects Deserve Some Love](https://rustjobs.dev/blog/episode-6-unit-testing-in-rust/)
 - [Episode 7 - Completing the Model & Wiring a CLI](https://rustjobs.dev/blog/episode-7-completing-the-model-and-wiring-a-cli/)
+- [Episode 8 - Overview of the Build Tool](https://rustjobs.dev/blog/episode-8-overview-of-the-build-tool/)
 
 ## Next up:
 
-- [Episode 8 - Overview of the Build Tool](https://rustjobs.dev/blog/episode-8-overview-of-the-build-tool/)
 - [Episode 9 - Build Data Structure](https://rustjobs.dev/blog/episode-9-build-data-structure/)
 - [Episode 10 - Searching Through Gear Combinations](https://rustjobs.dev/blog/episode-10-searching-through-gear-combinations/)
 - [Episode 11 - Restricting the Dataset](https://rustjobs.dev/blog/episode-11-restricting-the-dataset/)
