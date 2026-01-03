@@ -1,11 +1,7 @@
-// Part of the library. When the crate is compiled, the first step is to compile the library.
+// Dofus DB client implementation
 
-// use crate::... refers to the library's module hierarchy.
-// use packagename::... will not work inside the library part of the crate because only the
-// names of dependencies are available at the top level.
-
-use crate::dofus_db_models::{DofusDbTypeId, GetObjectsResponse};
-use crate::models::GearType;
+use crate::model::{DofusDbTypeId, GetObjectsResponse};
+use core::model::GearType;
 
 use serde_json::{Value as JsonValue};
 

@@ -1,19 +1,19 @@
 use anyhow::Result;
-use serde_json::Value as JsonValue;
-use serde::Deserialize;
+use serde_json::{Value as JsonValue, Value};
 use std::collections::HashSet;
-use crate::dofus_db_client::fetch_all_gears;
-use crate::dofus_db_file::{filename_safe_string, read_gears, save_json_gears};
-use crate::dofus_db_models::DofusDbObject;
-use crate::dofus_db_parser::parse_gears;
-use crate::models::{Gear, GearType};
+use serde::Deserialize;
+use core::model::{Gear, GearType};
+use crate::client::fetch_all_gears;
+use core::file::{filename_safe_string, read_gears, write_objects};
+use crate::model::DofusDbObject;
+use crate::parser::parse_gears;
 
-pub const IMPORT_PATH: &str = "dofus_db/data";
+pub const IMPORT_PATH: &str = "data/import";
 
 fn extract_gear_file_name(gear: &JsonValue) -> Option<String> {
     gear.pointer("/name/en")
         .and_then(|n| n.as_str())
-        .map(filename_safe_string)
+        .map(|s| filename_safe_string(String::from(s)))
 }
 
 fn remove_duplicates(values: &mut Vec<JsonValue>) {
@@ -74,9 +74,20 @@ pub async fn fetch_and_save_all_gears(dofus_db_export_path: &str, gear_type: &Ge
 
     display_parsed_gears(&mut parsed_gears, gear_type);
 
-    save_json_gears(dofus_db_export_path, gear_type, &gears, |o| &o["name"]["en"])?;
+    let folder_name = gear_type.to_string().to_lowercase();
 
-    read_gears(dofus_db_export_path, gear_type)?;
+    fn file_name() -> fn(&Value, usize) -> String {
+        |o, i| (&o["name"]["en"]).as_str().map(String::from).unwrap_or(format!("unknown_{}", i))
+    }
+
+    write_objects(
+        dofus_db_export_path,
+        folder_name,
+        &gears,
+        file_name(),
+    )?;
+
+    read_gears::<&str, DofusDbObject>(dofus_db_export_path, gear_type)?;
     
     Ok(())
 }

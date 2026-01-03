@@ -1,1 +1,0 @@
-pub mod old_dofus_db_client;

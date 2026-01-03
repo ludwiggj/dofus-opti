@@ -1,11 +1,7 @@
-// Part of the library. When the crate is compiled, the first step is to compile the library.
+// Dofus DB parser implementation
 
-// use crate::... refers to the library's module hierarchy.
-// use packagename::... will not work inside the library part of the crate because only the
-// names of dependencies are available at the top level.
-
-use crate::dofus_db_models::*;
-use crate::models::*;
+use crate::model::*;
+use core::model::*;
 
 pub fn parse_gears(gear_type: &GearType, dofus_db_objects: Vec<DofusDbObject>) -> Vec<Gear> {
     let mut gears: Vec<Gear> = Vec::new();
@@ -74,7 +70,7 @@ fn parse_characteristic_type(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dofus_db_file::read_json;
+    use crate::file::read_json;
     use anyhow::Result;
     use std::path::Path;
 
@@ -162,7 +158,11 @@ mod tests {
 
     #[test]
     fn parse_golden_gear() -> Result<()> {
-        let file_path = Path::new("golden").join("amulet_gargandyas_necklace.json");
+        let file_path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("src")
+            .join("golden")
+            .join("amulet_gargandyas_necklace.json");
+
         let json = read_json(file_path)?;
 
         let dofus_db_object: DofusDbObject = serde_json::from_value(json)?;

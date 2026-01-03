@@ -8,12 +8,12 @@
 // use packagename::... refers to the library's module hierarchy
 // use crate::...       refers to the binary's own module hierarchy
 use anyhow::Result;
-use dofus_opti::dofus_db_export::{export_parsed_data, EXPORT_PATH};
-use dofus_opti::dofus_db_import::{fetch_and_save_all_gears, IMPORT_PATH};
-use dofus_opti::models::ALL_GEAR_TYPES;
+use clap::Parser;
 use futures::{stream, StreamExt};
 use std::time::Instant;
-use clap::Parser;
+use dofus_db::export::{export_parsed_data, EXPORT_PATH};
+use dofus_db::import::{fetch_and_save_all_gears, IMPORT_PATH};
+use core::model::ALL_GEAR_TYPES;
 
 // The following modules are part of the binary only
 // They cannot be used by the library itself, or rust code that imports this library
@@ -23,8 +23,10 @@ mod args;
 
 use args::Args;
 
-// cargo run --bin dofus-opti -- -e
 // cargo run --bin dofus-opti -- -i
+// cargo run --bin dofus-opti -- -e
+
+// See https://www.sheshbabu.com/posts/rust-module-system/ for description of module system
 #[tokio::main]
 async fn main() -> Result<()> {
     let now = Instant::now();
@@ -51,17 +53,17 @@ async fn main() -> Result<()> {
 
     // read, parse, write out our model representation
     // Example layout:
+    // TODO - Adjust paths as needed
     //
-    // core/
-    // └── data/
-    //     ├── Amulet/
-    //     │   ├── aerdala_amulet.json
-    //     │   ├── helsephine_love.json
-    //     │   └── ...
-    //     ├── Belt/
-    //     │   ├── minotoror.json
-    //     │   ├── ogivol.json
-    //     │   └── ...
+    // data/
+    //  ├── Amulet/
+    //  │   ├── aerdala_amulet.json
+    //  │   ├── helsephine_love.json
+    //  │   └── ...
+    //  ├── Belt/
+    //  │   ├── minotoror.json
+    //  │   ├── ogivol.json
+    //  │   └── ...
 
     async fn export_data() {
         const MAX_CONCURRENCY: usize = 5;
