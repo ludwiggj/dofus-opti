@@ -8,7 +8,7 @@
 use std::fmt;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Gear {
     pub name: String,
     pub gear_type: GearType,
@@ -23,7 +23,11 @@ pub enum GearType {
     Belt,
     Boots,
     Bow,
+    Cloak,
+    Dagger,
+    Hat,
     Ring,
+    Shield,
     Sword,
 }
 
@@ -33,7 +37,11 @@ pub static ALL_GEAR_TYPES: &[GearType] = &[
     GearType::Belt,
     GearType::Boots,
     GearType::Bow,
+    GearType::Cloak,
+    GearType::Dagger,
+    GearType::Hat,
     GearType::Ring,
+    GearType::Shield,
     GearType::Sword,
 ];
 
@@ -45,7 +53,7 @@ impl fmt::Display for GearType {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct CharacteristicRange {
     pub kind: CharacteristicType,
     pub min: i32,

@@ -52,12 +52,16 @@ impl From<&GearType> for DofusDbTypeId {
     fn from(gear_type: &GearType) -> Self {
         let id = match gear_type {
             GearType::Amulet => 1,
-            GearType::Bow    => 2,
-            GearType::Sword  => 6,
-            GearType::Ring   => 9,
-            GearType::Boots  => 11,
             GearType::Axe    => 19,
-            GearType::Belt   => 30,
+            GearType::Belt   => 10,
+            GearType::Boots  => 11,
+            GearType::Bow    => 2,
+            GearType::Cloak  => 17,
+            GearType::Dagger => 5,
+            GearType::Hat    => 16,
+            GearType::Ring   => 9,
+            GearType::Shield => 82,
+            GearType::Sword  => 6,
         };
         DofusDbTypeId(id)
     }

@@ -23,9 +23,6 @@ mod args;
 
 use args::Args;
 
-// cargo run --bin dofus-opti -- -i
-// cargo run --bin dofus-opti -- -e
-
 // See https://www.sheshbabu.com/posts/rust-module-system/ for description of module system
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -51,20 +48,6 @@ async fn main() -> Result<()> {
         fetch_and_save().await;
     }
 
-    // read, parse, write out our model representation
-    // Example layout:
-    // TODO - Adjust paths as needed
-    //
-    // data/
-    //  ├── Amulet/
-    //  │   ├── aerdala_amulet.json
-    //  │   ├── helsephine_love.json
-    //  │   └── ...
-    //  ├── Belt/
-    //  │   ├── minotoror.json
-    //  │   ├── ogivol.json
-    //  │   └── ...
-
     async fn export_data() {
         const MAX_CONCURRENCY: usize = 5;
         stream::iter(ALL_GEAR_TYPES)
@@ -85,14 +68,8 @@ async fn main() -> Result<()> {
 
     if !args.import && !args.export {
         println!("No action specified. Use -i to import or -e to export.");
-        println!("Example: cargo run --bin dofus-opti -- -i");
-        println!("Importing as default action...\n");
-
-        // fetch_and_save_all_gears(IMPORT_PATH, &GearType::Belt).await.unwrap_or_default();
-        // export_parsed_data(EXPORT_PATH, &GearType::Belt).unwrap_or_default();
-
-        // fetch_and_save().await;
-        // export_data().await;
+        println!("Example import: cargo run --bin dofus-opti -- -i");
+        println!("Example export: cargo run --bin dofus-opti -- -e");
     }
 
     let elapsed = now.elapsed();
